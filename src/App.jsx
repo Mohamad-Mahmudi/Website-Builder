@@ -9,6 +9,8 @@ import Project from "./pages/Project";
 import Builder from "./pages/Builder";
 import LiveSite from "./pages/LiveSite";
 import BuilderStandalone from "./pages/BuilderStandalone";
+import Preview from "./pages/Preview";
+
 
 function App() {
   const { currentUser } = useAuth();
@@ -26,6 +28,7 @@ function App() {
         <Route path="/project/:id/builder" element={<Builder />} />
         <Route path="/site/:domain" element={<LiveSite />} />
         <Route path="/builder" element={<BuilderStandalone />} />
+        <Route path="/preview/:id" element={<Preview/>}/>
 
         <Route
           path="/dashboard"

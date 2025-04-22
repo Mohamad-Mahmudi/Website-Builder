@@ -1,5 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
+import { GripVertical, Trash2, Pencil, Save } from "lucide-react";
 
 export default function SortableItem({
   el,
@@ -10,8 +12,7 @@ export default function SortableItem({
   onEditSave,
   onDelete,
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: el.id });
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: el.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -19,46 +20,46 @@ export default function SortableItem({
   };
 
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
-      className="border p-4 rounded-xl bg-white shadow flex justify-between items-center"
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 10 }}
+      className="bg-white p-4 border rounded-xl flex justify-between items-center shadow-sm"
     >
-      <div className="flex-1">
+      <div className="flex items-center gap-4">
+        <GripVertical {...attributes} {...listeners} className="cursor-grab text-gray-500" />
+
         {isEditing ? (
           <input
-            type="text"
-            className="border p-2 rounded w-full"
+            className="border px-2 py-1 rounded"
             value={editValue}
             onChange={(e) => onEditChange(e.target.value)}
-            onBlur={onEditSave}
-            onKeyDown={(e) => e.key === "Enter" && onEditSave()}
             autoFocus
           />
+        ) : el.type === "text" ? (
+          <p className="text-lg">{el.content}</p>
         ) : (
-          <div
-            onClick={() => onEditStart(el)}
-            className="cursor-pointer select-none"
-          >
-            {el.type === "text" && <p className="text-lg">{el.content}</p>}
-            {el.type === "button" && (
-              <button className="bg-gray-800 text-white px-4 py-2 rounded-xl">
-                {el.content}
-              </button>
-            )}
-          </div>
+          <button className="bg-blue-500 text-white px-4 py-1 rounded">{el.content}</button>
         )}
       </div>
-      <div className="flex gap-2 ml-4">
-        <button
-          onClick={onDelete}
-          className="text-red-500 hover:underline"
-        >
-          🗑️ حذف
+
+      <div className="flex items-center gap-2">
+        {isEditing ? (
+          <button onClick={onEditSave}>
+            <Save className="w-5 h-5 text-green-600" />
+          </button>
+        ) : (
+          <button onClick={() => onEditStart(el)}>
+            <Pencil className="w-5 h-5 text-blue-500" />
+          </button>
+        )}
+        <button onClick={() => onDelete(el.id)}>
+          <Trash2 className="w-5 h-5 text-red-500" />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 }
