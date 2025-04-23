@@ -18,22 +18,22 @@ export default function Dashboard() {
   };
 
   // گرفتن پروژه‌ها از Firestore
-  useEffect(() => {
+  const fetchProjects = async () => {
     if (!currentUser) return;
 
-    const fetchProjects = async () => {
-      const q = query(
-        collection(db, "projects"),
-        where("owner", "==", currentUser.uid)
-      );
-      const querySnapshot = await getDocs(q);
-      const data = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setProjects(data);
-    };
+    const q = query(
+      collection(db, "projects"),
+      where("owner", "==", currentUser.uid)
+    );
+    const querySnapshot = await getDocs(q);
+    const data = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setProjects(data);
+  };
 
+  useEffect(() => {
     fetchProjects();
   }, [currentUser]);
 
@@ -43,15 +43,19 @@ export default function Dashboard() {
     const domain =
       newProjectName.toLowerCase().replace(/\s+/g, "-") + ".dimawebsites.com";
 
-    await addDoc(collection(db, "projects"), {
-      name: newProjectName,
-      domain,
-      owner: currentUser.uid,
-    });
-
-    setNewProjectName("");
-    setShowForm(false);
-    window.location.reload(); // موقتی برای رفرش لیست
+    try {
+      await addDoc(collection(db, "projects"), {
+        name: newProjectName,
+        domain,
+        owner: currentUser.uid,
+      });
+      setNewProjectName("");
+      setShowForm(false);
+      fetchProjects(); // بروزرسانی لیست پروژه‌ها بدون بارگذاری مجدد صفحه
+    } catch (error) {
+      console.error("Error creating project: ", error);
+      alert("مشکلی پیش آمد، لطفا دوباره تلاش کنید.");
+    }
   };
 
   return (
@@ -85,9 +89,7 @@ export default function Dashboard() {
         {/* لیست پروژه‌ها */}
         <div className="grid gap-4 md:grid-cols-3 sm:grid-cols-2">
           {projects.length === 0 && (
-            <p className="text-gray-500">
-              You don’t have any projects yet.
-            </p>
+            <p className="text-gray-500">You don’t have any projects yet.</p>
           )}
 
           {projects.map((project) => (
@@ -133,5 +135,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-

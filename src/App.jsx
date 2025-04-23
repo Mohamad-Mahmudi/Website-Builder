@@ -10,6 +10,10 @@ import Builder from "./pages/Builder";
 import LiveSite from "./pages/LiveSite";
 import BuilderStandalone from "./pages/BuilderStandalone";
 import Preview from "./pages/Preview";
+import CreateProject from "./pages/CreateProject";
+import UserPreview from "./pages/UserPreview";
+import EditProject from "./pages/EditProject";
+import ProjectBuilder from "./pages/ProjectBuilder";
 
 
 function App() {
@@ -29,6 +33,11 @@ function App() {
         <Route path="/site/:domain" element={<LiveSite />} />
         <Route path="/builder" element={<BuilderStandalone />} />
         <Route path="/preview/:id" element={<Preview/>}/>
+        <Route path="/u/:username" element={<UserPreview/>}/>
+        <Route path="/create" element={<CreateProject />} />
+        <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/project/:projectId/edit" element={<EditProject />} />
+        <Route path="/project/:projectId/builder" element={<ProjectBuilder />} />
 
         <Route
           path="/dashboard"
