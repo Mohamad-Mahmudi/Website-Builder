@@ -1,52 +1,59 @@
 // src/components/StyleEditor.jsx
 import React from "react";
 
-export default function StyleEditor({ styles, onChange }) {
+export default function StyleEditor({ element, onChange }) {
+  if (!element) return null;
+
+  const handleChange = (field, value) => {
+    const newStyles = { ...element.styles, [field]: value };
+    onChange({ ...element, styles: newStyles });
+  };
+
   return (
-    <div className="p-4 border rounded bg-white space-y-4 shadow-md">
-      <h3 className="text-lg font-semibold mb-2">🎨 تنظیمات استایل</h3>
+    <div className="p-4 bg-white rounded-lg shadow space-y-4">
+      <h3 className="text-lg font-bold mb-2">🎨 ویرایش استایل</h3>
 
-      <div>
-        <label className="block text-sm mb-1">🎨 رنگ متن:</label>
+      <div className="space-y-2">
+        <label className="block text-sm">رنگ متن:</label>
         <input
           type="color"
-          value={styles.color || "#000000"}
-          onChange={(e) => onChange({ ...styles, color: e.target.value })}
+          value={element.styles.color}
+          onChange={(e) => handleChange("color", e.target.value)}
         />
-      </div>
 
-      <div>
-        <label className="block text-sm mb-1">🖌 رنگ پس‌زمینه:</label>
+        <label className="block text-sm">رنگ پس‌زمینه:</label>
         <input
           type="color"
-          value={styles.backgroundColor || "#ffffff"}
-          onChange={(e) => onChange({ ...styles, backgroundColor: e.target.value })}
+          value={element.styles.backgroundColor}
+          onChange={(e) => handleChange("backgroundColor", e.target.value)}
         />
-      </div>
 
-      <div>
-        <label className="block text-sm mb-1">🔠 اندازه فونت:</label>
+        <label className="block text-sm">اندازه فونت (px):</label>
         <input
           type="number"
-          value={parseInt(styles.fontSize) || 16}
-          min={10}
-          max={60}
-          onChange={(e) => onChange({ ...styles, fontSize: e.target.value + "px" })}
-          className="border p-1 rounded w-full"
+          value={parseInt(element.styles.fontSize)}
+          onChange={(e) => handleChange("fontSize", `${e.target.value}px`)}
+          className="w-full border rounded p-1"
         />
-      </div>
 
-      <div>
-        <label className="block text-sm mb-1">📐 ترازبندی متن:</label>
+        <label className="block text-sm">ترازبندی متن:</label>
         <select
-          value={styles.textAlign || "right"}
-          onChange={(e) => onChange({ ...styles, textAlign: e.target.value })}
-          className="border p-1 rounded w-full"
+          value={element.styles.textAlign}
+          onChange={(e) => handleChange("textAlign", e.target.value)}
+          className="w-full border rounded p-1"
         >
-          <option value="right">راست</option>
-          <option value="center">مرکز</option>
-          <option value="left">چپ</option>
+          <option value="right">راست‌چین</option>
+          <option value="center">وسط‌چین</option>
+          <option value="left">چپ‌چین</option>
         </select>
+
+        <label className="block text-sm">Padding:</label>
+        <input
+          type="text"
+          value={element.styles.padding}
+          onChange={(e) => handleChange("padding", e.target.value)}
+          className="w-full border rounded p-1"
+        />
       </div>
     </div>
   );

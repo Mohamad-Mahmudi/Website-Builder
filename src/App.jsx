@@ -14,7 +14,7 @@ import CreateProject from "./pages/CreateProject";
 import UserPreview from "./pages/UserPreview";
 import EditProject from "./pages/EditProject";
 import ProjectBuilder from "./pages/ProjectBuilder";
-
+import SitePreview from "./pages/SitePreview";
 
 function App() {
   const { currentUser } = useAuth();
@@ -38,6 +38,7 @@ function App() {
         <Route path="/create-project" element={<CreateProject />} />
         <Route path="/project/:projectId/edit" element={<EditProject />} />
         <Route path="/project/:projectId/builder" element={<ProjectBuilder />} />
+        <Route path="/site/:id" element={<SitePreview />} />
 
         <Route
           path="/dashboard"

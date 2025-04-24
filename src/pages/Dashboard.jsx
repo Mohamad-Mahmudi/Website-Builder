@@ -4,6 +4,17 @@ import { signOut } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+import Layout from "../components/Layout";
+
+// کامپوننت SomePage
+export function SomePage() {
+  return (
+    <Layout>
+      <h1>صفحه‌ی من</h1>
+      <p>این یه متن ساده‌ست.</p>
+    </Layout>
+  );
+}
 
 export default function Dashboard() {
   const { currentUser } = useAuth();

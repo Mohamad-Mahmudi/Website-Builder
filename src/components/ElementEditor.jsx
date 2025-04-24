@@ -1,74 +1,131 @@
 import React from "react";
 
-function ElementEditor({ selected, onChange, onSave, onClose }) {
+export default function ElementEditor({ selected, onChange, onSave, onClose }) {
   if (!selected) return null;
 
-  const handleChange = (key, value) => {
-    onChange({
-      ...selected,
-      [key]: value,
-    });
+  const { type, content, styles } = selected;
+
+  const handleContentChange = (key, value) => {
+    const updatedContent =
+      typeof content === "object"
+        ? { ...content, [key]: value }
+        : value;
+    onChange({ ...selected, content: updatedContent });
   };
 
   const handleStyleChange = (key, value) => {
     onChange({
       ...selected,
       styles: {
-        ...selected.styles,
+        ...styles,
         [key]: value,
       },
     });
   };
 
-  return (
-    <div className="w-full md:w-80 bg-white p-4 shadow-lg rounded-xl border">
-      <h3 className="text-lg font-bold mb-4">🛠️ ویرایشگر</h3>
-
-      {selected.type !== "form" && (
-        <div className="mb-4">
-          <label className="block mb-1">محتوا:</label>
-          <input
-            value={selected.content}
-            onChange={(e) => handleChange("content", e.target.value)}
+  const renderContentEditor = () => {
+    switch (type) {
+      case "text":
+      case "button":
+      case "header":
+      case "footer":
+      case "form":
+        return (
+          <textarea
+            value={content}
+            onChange={(e) => handleContentChange("content", e.target.value)}
+            rows={3}
             className="w-full p-2 border rounded"
           />
-        </div>
-      )}
+        );
 
-      <div className="mb-4">
+      case "image":
+      case "video":
+        return (
+          <input
+            type="text"
+            value={content}
+            onChange={(e) => handleContentChange("content", e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="URL"
+          />
+        );
+
+      case "hero":
+        return (
+          <div className="space-y-2">
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="عنوان"
+              value={content.title}
+              onChange={(e) => handleContentChange("title", e.target.value)}
+            />
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="زیرعنوان"
+              value={content.subtitle}
+              onChange={(e) => handleContentChange("subtitle", e.target.value)}
+            />
+            <input
+              type="text"
+              className="w-full p-2 border rounded"
+              placeholder="متن دکمه"
+              value={content.buttonText}
+              onChange={(e) => handleContentChange("buttonText", e.target.value)}
+            />
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="w-full md:w-96 bg-white p-5 shadow-lg rounded-xl border space-y-4">
+      <h3 className="text-lg font-bold">🛠️ ویرایشگر {type}</h3>
+
+      <div>
+        <label className="block mb-1">محتوا:</label>
+        {renderContentEditor()}
+      </div>
+
+      <div>
         <label className="block mb-1">رنگ متن:</label>
         <input
           type="color"
-          value={selected.styles?.color || "#000000"}
+          value={styles?.color || "#000000"}
           onChange={(e) => handleStyleChange("color", e.target.value)}
         />
       </div>
 
-      <div className="mb-4">
+      <div>
         <label className="block mb-1">رنگ پس‌زمینه:</label>
         <input
           type="color"
-          value={selected.styles?.backgroundColor || "#ffffff"}
+          value={styles?.backgroundColor || "#ffffff"}
           onChange={(e) => handleStyleChange("backgroundColor", e.target.value)}
         />
       </div>
 
-      <div className="mb-4">
+      <div>
         <label className="block mb-1">اندازه فونت:</label>
         <input
           type="number"
-          value={parseInt(selected.styles?.fontSize) || 16}
-          onChange={(e) => handleStyleChange("fontSize", `${e.target.value}px`)}
           className="w-full p-2 border rounded"
+          value={parseInt(styles?.fontSize) || 16}
+          onChange={(e) => handleStyleChange("fontSize", `${e.target.value}px`)}
         />
       </div>
 
-      <div className="mb-4">
+      <div>
         <label className="block mb-1">تراز متن:</label>
         <select
-          value={selected.styles?.textAlign || "right"}
-          onChange={(e) => handleStyleChange("textAlign", e.target.value)}
           className="w-full p-2 border rounded"
+          value={styles?.textAlign || "right"}
+          onChange={(e) => handleStyleChange("textAlign", e.target.value)}
         >
           <option value="right">راست</option>
           <option value="center">وسط</option>
@@ -76,7 +133,7 @@ function ElementEditor({ selected, onChange, onSave, onClose }) {
         </select>
       </div>
 
-      <div className="flex justify-between mt-6">
+      <div className="flex justify-between pt-4">
         <button
           onClick={onSave}
           className="bg-green-600 text-white px-4 py-2 rounded-xl"
@@ -93,5 +150,3 @@ function ElementEditor({ selected, onChange, onSave, onClose }) {
     </div>
   );
 }
-
-export default ElementEditor;

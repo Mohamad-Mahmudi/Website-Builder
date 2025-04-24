@@ -1,12 +1,14 @@
-// components/preview/LivePreview.jsx
 import React from "react";
-import TextBlock from "./TextBlock";
-import ButtonBlock from "./ButtonBlock";
-import ImageBlock from "./ImageBlock";
-import VideoBlock from "./VideoBlock";
-import FormBlock from "./FormBlock";
+import TextBlock from "./preview/TextBlock";
+import ButtonBlock from "./preview/ButtonBlock";
+import ImageBlock from "./preview/ImageBlock";
+import VideoBlock from "./preview/VideoBlock";
+import FormBlock from "./preview/FormBlock";
+import HeroSection from "./preview/HeroSection"; // اضافه شد
+import HeaderBlock from "./preview/HeaderBlock"; // اضافه شد
+import FooterBlock from "./preview/FooterBlock"; // اضافه شد
 
-export default function LivePreview({ elements }) {
+export default function LivePreview({ elements, onSelect, selectedId }) {
   const renderElement = (el) => {
     switch (el.type) {
       case "text":
@@ -19,6 +21,12 @@ export default function LivePreview({ elements }) {
         return <VideoBlock content={el.content} styles={el.styles} />;
       case "form":
         return <FormBlock styles={el.styles} />;
+      case "hero":
+        return <HeroSection content={el.content} styles={el.styles} />;
+      case "header":
+        return <HeaderBlock content={el.content} styles={el.styles} />;
+      case "footer":
+        return <FooterBlock content={el.content} styles={el.styles} />;
       default:
         return null;
     }
@@ -29,7 +37,15 @@ export default function LivePreview({ elements }) {
       <h2 className="text-xl font-bold mb-4">پیش‌نمایش سایت</h2>
       <div className="space-y-4">
         {elements.map((el) => (
-          <div key={el.id} className="border p-4 rounded-lg bg-white">
+          <div
+            key={el.id}
+            onClick={() => onSelect(el)}
+            className={`border p-4 rounded-lg bg-white cursor-pointer transition-all ${
+              el.id === selectedId
+                ? "ring-2 ring-blue-500"
+                : "hover:ring-1 hover:ring-gray-400"
+            }`}
+          >
             {renderElement(el)}
           </div>
         ))}
