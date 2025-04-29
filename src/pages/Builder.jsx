@@ -22,7 +22,6 @@ import {
 } from "@dnd-kit/sortable";
 import SortableItem from "../components/SortableItem";
 
-
 export default function Builder() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -209,8 +208,8 @@ export default function Builder() {
         💾 ذخیره سایت
       </button>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        <div className="md:col-span-2">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="flex-1">
           <DndContext
             sensors={sensors}
             collisionDetection={closestCenter}
@@ -239,7 +238,7 @@ export default function Builder() {
             </SortableContext>
           </DndContext>
         </div>
-        <div>
+        <div className="flex flex-col w-full lg:w-1/2 gap-4">
           <LivePreview
             elements={elements}
             onSelect={handleSelect}

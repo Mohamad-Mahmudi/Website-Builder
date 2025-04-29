@@ -5,13 +5,23 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { AuthProvider } from './contexts/AuthContext.jsx';
+import { ThemeProvider } from './contexts/ThemeContext.jsx';
+
+
+
+document.body.removeAttribute("style");
+document.body.className = "";
+
+
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <App/>
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
     </AuthProvider>
   </React.StrictMode>
 );
-
 

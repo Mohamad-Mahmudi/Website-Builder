@@ -1,55 +1,63 @@
+// src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { signOut } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { auth, db } from "../firebase/firebase";
 import { useNavigate, Link } from "react-router-dom";
 import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import Layout from "../components/Layout";
-
-// کامپوننت SomePage
-export function SomePage() {
-  return (
-    <Layout>
-      <h1>صفحه‌ی من</h1>
-      <p>این یه متن ساده‌ست.</p>
-    </Layout>
-  );
-}
 
 export default function Dashboard() {
   const { currentUser } = useAuth();
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [newProjectName, setNewProjectName] = useState("");
 
-  const handleLogout = async () => {
-    await signOut(auth);
-    navigate("/login");
-  };
-
-  // گرفتن پروژه‌ها از Firestore
-  const fetchProjects = async () => {
-    if (!currentUser) return;
-
-    const q = query(
-      collection(db, "projects"),
-      where("owner", "==", currentUser.uid)
-    );
-    const querySnapshot = await getDocs(q);
-    const data = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setProjects(data);
-  };
-
   useEffect(() => {
+    if (!currentUser) {
+      navigate("/login");
+      return;
+    }
+
+    const fetchProjects = async () => {
+      try {
+        const q = query(
+          collection(db, "projects"),
+          where("owner", "==", currentUser.uid)
+        );
+        const querySnapshot = await getDocs(q);
+        const data = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProjects(data);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProjects();
-  }, [currentUser]);
+  }, [currentUser, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+
+      localStorage.removeItem("userToken");
+      sessionStorage.clear();
+      navigate("/login");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      alert("مشکلی در خروج پیش آمد. لطفا دوباره تلاش کنید.")
+    }
+  };
 
   const handleCreateProject = async () => {
-    if (!newProjectName) return;
+    if (!newProjectName.trim()) return;
 
     const domain =
       newProjectName.toLowerCase().replace(/\s+/g, "-") + ".dimawebsites.com";
@@ -62,66 +70,85 @@ export default function Dashboard() {
       });
       setNewProjectName("");
       setShowForm(false);
-      fetchProjects(); // بروزرسانی لیست پروژه‌ها بدون بارگذاری مجدد صفحه
+      // Refresh project list
+      const q = query(
+        collection(db, "projects"),
+        where("owner", "==", currentUser.uid)
+      );
+      const querySnapshot = await getDocs(q);
+      const data = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProjects(data);
     } catch (error) {
-      console.error("Error creating project: ", error);
+      console.error("Error creating project:", error);
       alert("مشکلی پیش آمد، لطفا دوباره تلاش کنید.");
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <header className="flex justify-between items-center mb-8">
-        <div>
-          <h1 className="text-3xl font-bold">👋 Welcome!</h1>
-          <p>
-            You are logged in as <strong>{currentUser?.email}</strong>
-          </p>
-        </div>
-        <button
-          onClick={handleLogout}
-          className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600"
-        >
-          Logout
-        </button>
-      </header>
+  if (!currentUser) return null;
 
-      <section>
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-semibold">Your Websites</h2>
+  return (
+    <Layout>
+      <div className="p-6 space-y-8">
+        {/* هدر داشبورد */}
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold">👋 خوش اومدی!</h1>
+            <p>
+              ورود با ایمیل: <strong>{currentUser?.email}</strong>
+            </p>
+          </div>
           <button
-            onClick={() => setShowForm(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded-xl hover:bg-red-600"
           >
-            + New Website
+            خروج
           </button>
         </div>
 
         {/* لیست پروژه‌ها */}
-        <div className="grid gap-4 md:grid-cols-3 sm:grid-cols-2">
-          {projects.length === 0 && (
-            <p className="text-gray-500">You don’t have any projects yet.</p>
-          )}
-
-          {projects.map((project) => (
-            <Link
-              to={`/project/${project.id}/builder`}
-              key={project.id}
-              className="bg-white p-6 rounded-xl shadow hover:shadow-lg block"
+        <section className="space-y-6">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold">وبسایت‌های شما</h2>
+            <button
+              onClick={() => setShowForm(true)}
+              className="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700"
             >
-              <h3 className="text-lg font-bold">{project.name}</h3>
-              <p className="text-sm text-gray-500 mt-2">{project.domain}</p>
-            </Link>
-          ))}
-        </div>
+              + ساخت وبسایت جدید
+            </button>
+          </div>
+
+          {loading ? (
+            <p>در حال بارگذاری پروژه‌ها...</p>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-3 sm:grid-cols-2">
+              {projects.length === 0 ? (
+                <p className="text-gray-500">هیچ پروژه‌ای هنوز ندارید.</p>
+              ) : (
+                projects.map((project) => (
+                  <Link
+                    to={`/project/${project.id}/builder`}
+                    key={project.id}
+                    className="bg-white p-6 rounded-xl shadow hover:shadow-lg block transition duration-300"
+                  >
+                    <h3 className="text-lg font-bold">{project.name}</h3>
+                    <p className="text-sm text-gray-500 mt-2">{project.domain}</p>
+                  </Link>
+                ))
+              )}
+            </div>
+          )}
+        </section>
 
         {/* فرم ساخت پروژه جدید */}
         {showForm && (
-          <div className="mt-8 bg-white p-6 rounded-xl shadow space-y-4 max-w-md">
-            <h3 className="text-xl font-bold">Create New Website</h3>
+          <section className="bg-white p-6 rounded-xl shadow max-w-md space-y-4">
+            <h3 className="text-xl font-bold">ساخت وبسایت جدید</h3>
             <input
               type="text"
-              placeholder="Enter website name"
+              placeholder="نام وبسایت را وارد کنید"
               className="w-full p-3 border rounded-xl"
               value={newProjectName}
               onChange={(e) => setNewProjectName(e.target.value)}
@@ -131,18 +158,18 @@ export default function Dashboard() {
                 onClick={handleCreateProject}
                 className="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700"
               >
-                Create
+                ساختن
               </button>
               <button
                 onClick={() => setShowForm(false)}
                 className="bg-gray-300 px-4 py-2 rounded-xl"
               >
-                Cancel
+                انصراف
               </button>
             </div>
-          </div>
+          </section>
         )}
-      </section>
-    </div>
+      </div>
+    </Layout>
   );
 }

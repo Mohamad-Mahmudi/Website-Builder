@@ -1,33 +1,54 @@
-
-
 import { createContext, useContext, useEffect, useState } from "react";
-import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "../firebase";
+import API from "../api"; // axios instance
 
-// ساخت context
 const AuthContext = createContext();
 
-// هوک دسترسی سریع
-export const useAuth = () => useContext(AuthContext);
-
-// Provider
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // وقتی لاگین یا لاگ‌اوت شد
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
+  // توکن رو از localStorage بخون
+  const token = localStorage.getItem("token");
 
-    return () => unsubscribe();
-  }, []);
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await API.get("/auth/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        setCurrentUser(response.data.user); // فرض: سرور کاربر رو در فیلد user میفرسته
+      } catch (error) {
+        console.error("خطا در گرفتن اطلاعات کاربر:", error);
+        localStorage.removeItem("token");
+        setCurrentUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [token]);
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    setCurrentUser(null);
+  };
 
   return (
-    <AuthContext.Provider value={{ currentUser }}>
+    <AuthContext.Provider value={{ currentUser, token, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );
-};
+}
+
+export function useAuth() {
+  return useContext(AuthContext);
+}

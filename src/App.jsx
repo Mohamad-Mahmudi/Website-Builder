@@ -16,7 +16,10 @@ import EditProject from "./pages/EditProject";
 import ProjectBuilder from "./pages/ProjectBuilder";
 import SitePreview from "./pages/SitePreview";
 
+
 function App() {
+  document.documentElement.classList.add("dark");
+  
   const { currentUser } = useAuth();
   return (
     <Router basename="/builder">
