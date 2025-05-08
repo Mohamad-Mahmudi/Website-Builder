@@ -1,10 +1,10 @@
 // src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { signOut } from "firebase/auth";
-import { auth, db } from "../firebase/firebase";
+// import { signOut } from "firebase/auth";
+// import { auth, db } from "../firebase/firebase";
 import { useNavigate, Link } from "react-router-dom";
-import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
+// import { collection, query, where, getDocs, addDoc } from "firebase/firestore";
 import Layout from "../components/Layout";
 
 export default function Dashboard() {

@@ -15,7 +15,7 @@ import UserPreview from "./pages/UserPreview";
 import EditProject from "./pages/EditProject";
 import ProjectBuilder from "./pages/ProjectBuilder";
 import SitePreview from "./pages/SitePreview";
-
+import AuthLanding from "./pages/Auth/AuthLanding";
 
 function App() {
   document.documentElement.classList.add("dark");
@@ -42,6 +42,7 @@ function App() {
         <Route path="/project/:projectId/edit" element={<EditProject />} />
         <Route path="/project/:projectId/builder" element={<ProjectBuilder />} />
         <Route path="/site/:id" element={<SitePreview />} />
+        <Route path="/auth" element={<AuthLanding/>} />
 
         <Route
           path="/dashboard"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { db } from "../firebase";
+// import { collection, query, where, getDocs } from "firebase/firestore";
+// import { db } from "../firebase";
 
 export default function LiveSite() {
   const { domain } = useParams();

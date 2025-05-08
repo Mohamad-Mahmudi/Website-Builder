@@ -1,0 +1,4 @@
+1. نصب MongoDB از سایت رسمی
+2. افزودن مسیر bin به متغیرهای محیطی
+3. ساخت پوشه‌های C:\data\db و C:\data\log
+4. اجرای فایل start_mongodb.bat برای راه‌اندازی MongoDB

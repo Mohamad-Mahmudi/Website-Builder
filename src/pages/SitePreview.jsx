@@ -1,8 +1,8 @@
 // src/pages/SitePreview.jsx
 import { useParams } from "react-router-dom";
-import { doc, getDoc } from "firebase/firestore";
+// import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { db } from "../firebase";
+// import { db } from "../firebase";
 import LivePreview from "../components/LivePreview";
 
 export default function SitePreview() {

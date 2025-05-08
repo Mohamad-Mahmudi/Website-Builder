@@ -5,10 +5,8 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token"));
   const [loading, setLoading] = useState(true);
-
-  // توکن رو از localStorage بخون
-  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -18,17 +16,16 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        const response = await API.get("/auth/me", {
+        const res = await API.get("/auth/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
 
-        setCurrentUser(response.data.user); // فرض: سرور کاربر رو در فیلد user میفرسته
-      } catch (error) {
-        console.error("خطا در گرفتن اطلاعات کاربر:", error);
-        localStorage.removeItem("token");
-        setCurrentUser(null);
+        setCurrentUser(res.data.user);
+      } catch (err) {
+        console.error("خطا در گرفتن اطلاعات کاربر:", err);
+        logout(); // اگر توکن نامعتبر بود، کاربر رو خارج کن
       } finally {
         setLoading(false);
       }
@@ -37,13 +34,19 @@ export function AuthProvider({ children }) {
     fetchUser();
   }, [token]);
 
+  const login = (newToken) => {
+    localStorage.setItem("token", newToken);
+    setToken(newToken);
+  };
+
   const logout = () => {
     localStorage.removeItem("token");
+    setToken(null);
     setCurrentUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ currentUser, token, logout }}>
+    <AuthContext.Provider value={{ currentUser, token, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

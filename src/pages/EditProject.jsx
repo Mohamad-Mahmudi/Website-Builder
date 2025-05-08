@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { db } from "../firebase";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
+// import { db } from "../firebase";
+// import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function EditProject() {

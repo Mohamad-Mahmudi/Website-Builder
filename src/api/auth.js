@@ -1,11 +1,4 @@
-import axios from "axios";
+import API from "./index";
 
-const API = axios.create({
-  baseURL: "http://localhost:5000/api/auth", // آدرس سرور
-});
-
-// ثبت نام
-export const register = (formData) => API.post("/register", formData);
-
-// لاگین
-export const login = (formData) => API.post("/login", formData);
+export const register = (formData) => API.post("/auth/register", formData);
+export const login = (formData) => API.post("/auth/login", formData);
